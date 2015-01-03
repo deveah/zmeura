@@ -7,12 +7,14 @@ local Terrain = require "lua/terrain"
 local Mapgen = {}
 
 --  Mapgen.randomFill - fills the provided map with all availible terrain
---  types, uniformly random
+--  types (except for 'void' terrain), uniformly random
 --  map: the map to work on
 function Mapgen.randomFill(map)
   local tileTypes = {}
-  for _, v in pairs(Terrain) do
-    table.insert(tileTypes, v)
+  for k, v in pairs(Terrain) do
+    if k ~= "void" then
+      table.insert(tileTypes, v)
+    end
   end
 
   for i = 1, map.width do
