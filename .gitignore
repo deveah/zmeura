@@ -1,0 +1,8 @@
+*.swp
+*.swo
+
+zmeura
+*.exe
+*.dll
+
+log.txt
