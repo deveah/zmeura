@@ -4,6 +4,7 @@
 
 local Actor = require "lua/actor"
 local Map = require "lua/map"
+local Mapgen = require "lua/mapgen"
 local Terrain = require "lua/terrain"
 
 local Game = {}
@@ -59,7 +60,7 @@ function Game:initialize()
 
   --  create an empty map (filled with floor tiles), and place it into the map list
   local tempMap = Map.new(100, 100)
-  tempMap:fill(Terrain.floor)
+  Mapgen.randomFill(tempMap)
   self:addMap(tempMap)
 
   --  create the player

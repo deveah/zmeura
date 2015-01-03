@@ -90,8 +90,8 @@ function Actor:moveRelative(dx, dy)
   end
 
   --  check if the desired coordinate is not solid (it can be moved upon)
-  if not self.map:isSolid(self.x+dx, self.y+dy) then
-    L:write("\tActor tried to move onto a solid tile.")
+  if self.map:isSolid(self.x+dx, self.y+dy) then
+    L:write("\tActor tried to move onto a solid tile.\n")
     return false
   end
 

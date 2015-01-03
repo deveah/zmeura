@@ -70,7 +70,7 @@ function Map:isSolid(x, y)
   end
 
   --  return the tile's 'solid' characteristic
-  return self.tile[x][y]
+  return self.tile[x][y].solid
 end
 
 --  Map:fill - fills the whole map with a single terrain tile
