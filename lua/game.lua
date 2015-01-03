@@ -193,12 +193,12 @@ function Game:drawMainScreen()
   --  clear the window for a new draw
   curses.clear()
 
-  --  update the camera coordinates
-  self:updateCamera()
+  --  update the camera coordinates to center on the player
+  self:updateCamera(self.player.x, self.player.y)
 
   --  draw the map display, which is 60x20, and scrolling
-  for i = self.cameraX, self.cameraX + 60 do
-    for j = self.cameraY, self.cameraY + 20 do
+  for i = self.cameraX, self.cameraX + 59 do
+    for j = self.cameraY, self.cameraY + 19 do
       local t = m:getTile(i, j)
 
       --  don't draw anything if it's out of bounds
@@ -224,7 +224,6 @@ function Game:drawMainScreen()
   curses.attr(curses.white)
   curses.write(60, 0, "Player: " .. self.player.x .. ", " .. self.player.y)
   curses.write(60, 1, "Camera: " .. self.cameraX .. ", " .. self.cameraY)
-  curses.write(60, 2, "Tile: " .. self.player.map:getTile(self.player.x, self.player.y).name)
 
   --  put the cursor on the player
   curses.move(self.player.x - self.cameraX, self.player.y - self.cameraY)
@@ -232,23 +231,24 @@ function Game:drawMainScreen()
   self.log:write("Terminated drawing the main screen.\n")
 end
 
---  Game:updateCamera - updates the camera coordinates so that the player stays
---  relatively centered in view; only moves the camera one square in any
---  direction per call, to give the sensation of scrolling
-function Game:updateCamera()
+--  Game:updateCamera - updates the camera coordinates so that the given
+--  coordinates stay relatively centered in view; only moves the camera one
+--  square in any direction per call, to give the sensation of scrolling
+--  x, y: position to move the camera towards
+function Game:updateCamera(x, y)
   --  these margins designate the 'center' zone of the view
   local upperMargin, lowerMargin, leftMargin, rightMargin = 5, 15, 20, 40
 
-  if self.player.x - self.cameraX < leftMargin then
+  if x - self.cameraX < leftMargin then
     self.cameraX = self.cameraX - 1
   end
-  if self.player.x - self.cameraX > rightMargin then
+  if x - self.cameraX > rightMargin then
     self.cameraX = self.cameraX + 1
   end
-  if self.player.y - self.cameraY < upperMargin then
+  if y - self.cameraY < upperMargin then
     self.cameraY = self.cameraY - 1
   end
-  if self.player.y - self.cameraY > lowerMargin then
+  if y - self.cameraY > lowerMargin then
     self.cameraY = self.cameraY + 1
   end
 end
@@ -259,6 +259,58 @@ end
 function Game:coordinateInView(x, y)
   return (  x >= self.cameraX and y >= self.cameraY and
             x < self.cameraX + 60 and y < self.cameraY + 20)
+end
+
+--  Game:lookAt - enters 'look mode', which allows the user to look around
+--  with the same keys as used for player movement; looking is limited to the
+--  insides of the current viewport
+--  x, y: the position the looking starts from
+function Game:lookAt(x, y)
+  --  current coordinates
+  local cx, cy = x, y
+
+  --  key pressed
+  local k = ""
+
+  while k ~= "q" do
+    --  redraw the main screen
+    self:drawMainScreen()
+
+    --  the examined tile
+    local t = self.player.map:getTile(cx, cy)
+
+    --  draw examination details
+    curses.attr(curses.yellow)
+    curses.write(0, 20, "Looking (q to quit)")
+    curses.attr(curses.white)
+    curses.write(0, 21, "Tile: " .. t.name)
+    curses.write(0, 22, t.description)
+
+    --  center the cursor on the examined position
+    curses.move(cx - self.cameraX, cy - self.cameraY)
+
+    k = curses.getch()
+    if k == "h" then
+      if cx > self.cameraX then
+        cx = cx - 1
+      end
+    end
+    if k == "j" then
+      if cy < self.cameraY + 19 then
+        cy = cy + 1
+      end
+    end
+    if k == "k" then
+      if cy > self.cameraY then
+        cy = cy - 1
+      end
+    end
+    if k == "l" then
+      if cx < self.cameraX + 59 then
+        cx = cx + 1
+      end
+    end
+  end
 end
 
 return Game

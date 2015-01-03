@@ -57,7 +57,15 @@ function Actor:handleKey(key)
     return self:moveRelative(1, 0)
   end
 
-  --  system keys
+  --  look/examine key
+  if key == "x" then
+    self.gameInstance:lookAt(self.x, self.y)
+
+    --  looking around doesn't spend a turn
+    return false
+  end
+
+  --  quit key
   if key == "q" then
     --  exit the game loop abruptly
     self.gameInstance.running = false
