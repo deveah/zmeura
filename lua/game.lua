@@ -253,8 +253,8 @@ function Game:drawMainScreen()
 
   --  write some useful data (debugging purposes)
   curses.attr(curses.white)
-  curses.write(60, 0, "Player: " .. self.player.x .. ", " .. self.player.y)
-  curses.write(60, 1, "Camera: " .. self.cameraX .. ", " .. self.cameraY)
+  curses.write(Global.viewportWidth, 0, "Player: " .. self.player.x .. ", " .. self.player.y)
+  curses.write(Global.viewportWidth, 1, "Camera: " .. self.cameraX .. ", " .. self.cameraY)
 
   --  draw the last five messages
   for i = 0, 4 do
@@ -320,6 +320,12 @@ function Game:lookAt(x, y)
 
     --  the examined tile
     local t = self.player.map:getTile(cx, cy)
+
+    --  clear the space reserved for looking information
+    for i = Global.viewportHeight, Global.minimalTerminalHeight do
+      curses.move(0, i)
+      curses.clrtoeol()
+    end
 
     --  draw examination details
     curses.attr(curses.yellow)
