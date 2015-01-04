@@ -342,25 +342,17 @@ function Game:lookAt(x, y)
     curses.move(cx - self.cameraX, cy - self.cameraY)
 
     k = curses.getch()
-    if k == "h" then
-      if cx > self.cameraX then
-        cx = cx - 1
-      end
+    if k == "h" and cx > self.cameraX then
+      cx = cx - 1
     end
-    if k == "j" then
-      if cy < self.cameraY + Global.viewportHeight - 1 then
-        cy = cy + 1
-      end
+    if k == "j" and cy < self.cameraY + Global.viewportHeight - 1 then
+      cy = cy + 1
     end
-    if k == "k" then
-      if cy > self.cameraY then
-        cy = cy - 1
-      end
+    if k == "k" and cy > self.cameraY then
+      cy = cy - 1
     end
-    if k == "l" then
-      if cx < self.cameraX + Global.viewportWidth - 1 then
-        cx = cx + 1
-      end
+    if k == "l" and cx < self.cameraX + Global.viewportWidth - 1 then
+      cx = cx + 1
     end
   end
 end
