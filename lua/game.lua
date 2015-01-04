@@ -283,8 +283,12 @@ function Game:lookAt(x, y)
     curses.attr(curses.yellow)
     curses.write(0, 20, "Looking (q to quit)")
     curses.attr(curses.white)
-    curses.write(0, 21, "Tile: " .. t.name)
-    curses.write(0, 22, t.description)
+    if t then
+      curses.write(0, 21, "Tile: " .. t.name)
+      curses.write(0, 22, t.description)
+    else
+      curses.write(0, 21, "Tile out of bounds.")
+    end
 
     --  center the cursor on the examined position
     curses.move(cx - self.cameraX, cy - self.cameraY)
