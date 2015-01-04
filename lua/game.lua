@@ -65,7 +65,7 @@ function Game:initialize()
 
   --  create an empty map (filled with floor tiles), and place it into the map list
   local tempMap = Map.new(100, 100)
-  Mapgen.forest(tempMap, 0.2, 0.8)
+  Mapgen.forest(tempMap, 0.2, 0.8, 0.01)
   self:addMap(tempMap)
 
   --  create the player
@@ -105,6 +105,9 @@ function Game:loop()
       local a = self.actorList[i]
       self.log:write("Actor " .. tostring(a) .. " now acting.\n")
 
+      a:updateStats()
+      self.log:write("\tUpdated stats.\n")
+
       if a.isPlayer then
         --  the actor is player-controlled, so update the screen, get input,
         --  and pass onto translating the keystroke into an action
@@ -114,6 +117,9 @@ function Game:loop()
       else
         --  no AI for now, so leave the actor alone
       end
+
+      --  increase the actor's turn count
+      a.turns = a.turns + 1
     end
   end
 
@@ -255,6 +261,8 @@ function Game:drawMainScreen()
   curses.attr(curses.white)
   curses.write(Global.viewportWidth, 0, "Player: " .. self.player.x .. ", " .. self.player.y)
   curses.write(Global.viewportWidth, 1, "Camera: " .. self.cameraX .. ", " .. self.cameraY)
+
+  curses.write(Global.viewportWidth, 3, "Thirst: " .. self.player.thirst .. "%")
 
   --  draw the last five messages
   for i = 0, 4 do

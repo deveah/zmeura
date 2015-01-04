@@ -4,6 +4,8 @@
 --  An actor is a live being who has the right to act when prompted by the
 --  game loop.
 
+local Terrain = require "lua/terrain"
+
 local Actor = {}
 Actor.__index = Actor
 
@@ -30,6 +32,15 @@ function Actor.new(name, face, color)
   a.y = 0
   a.map = nil
 
+  --  stats
+
+  --  turns: counts the actions the actor has taken
+  a.turns = 0
+
+  --  thirst: replenishes when drinking water
+  --  0 means 'not thirsty', 100 means 'maximum thirst'
+  a.thirst = 0
+
   --  the sightMap is an array as big as the map the actor currently is on,
   --  and holds information about the visibility of the tiles
   a.sightMap = nil
@@ -38,6 +49,15 @@ function Actor.new(name, face, color)
   a.gameInstance = nil
 
   return a
+end
+
+--  Actor:updateStats - updates stats depending on the current environment,
+--  status effects etc.
+function Actor:updateStats()
+  --  thirst increases once every 10 turns
+  if self.turns % 10 == 0 then
+    self:modifyThirst(1)
+  end
 end
 
 --  Actor:resetSightMap - resizes the sight map to fit the map the actor
@@ -139,6 +159,11 @@ function Actor:handleKey(key)
     return false
   end
 
+  --  use terrain/apply key
+  if key == "a" then
+    return self:useTerrain()
+  end
+
   --  quit key
   if key == "q" then
     --  exit the game loop abruptly
@@ -200,6 +225,59 @@ function Actor:moveRelative(dx, dy)
   self.y = self.y + dy
   L:write("\tOk.\n")
   return true
+end
+
+--  Actor:modifyThirst - modifies the actor's thirst value
+--  quantity: can be either negative (replenishing) or positive
+function Actor:modifyThirst(quantity)
+  self.thirst = self.thirst + quantity
+
+  --  clip the value between 0 and 100
+  if self.thirst < 0 then
+    self.thirst = 0
+  end
+  if self.thirst > 100 then
+    self.thirst = 100
+  end
+end
+
+--  Actor:useTerrain - uses the terrain tile the actor is currently on
+function Actor:useTerrain()
+  local t = self.map:getTile(self.x, self.y)
+
+  if t.name == "Puddle" then
+    --  using a pond means drinking from it; drinking from a pond replenishes
+    --  2% thirst
+    self:modifyThirst(-2)
+
+    if self.isPlayer then
+      self.gameInstance:announce("You drink from the pond.")
+    end
+
+    --  you can't drink from a pond ad infinitum, so decrease the number of
+    --  uses this terrain tile still has
+    self.map:modifyTileUses(self.x, self.y, -1)
+    if self.map:getTileUses(self.x, self.y) <= 0 then
+      --  the puddle is no more; turn it into dirt
+      self.map:setTile(self.x, self.y, Terrain["dirt"])
+
+      --  let the user know there no longer is a pond here
+      if self.isPlayer then
+        self.gameInstance:announce("The pond has vanished.")
+      end
+    end
+
+    --  the action has been successfully taken care of
+    return true
+  else
+    --  there's no use for such tile, so announce this issue
+    if self.isPlayer then
+      self.gameInstance:announce("There's no use in that.")
+    end
+
+    --  don't count this as an action
+    return false
+  end
 end
 
 return Actor

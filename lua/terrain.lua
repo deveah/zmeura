@@ -60,6 +60,16 @@ return {
     breakable = true,
     hitPoints = 3,
     breaksInto = "dirt"
+  },
+  ["puddle"] = {
+    name = "Puddle",
+    description = "A small puddle of water. Seems fresh.",
+    face = "~",
+    color = curses.blue,
+    solid = false,
+    opaque = false,
+    breakable = false,
+    uses = 3  -- you can drink three times from a puddle before it vanishes
   }
 }
 

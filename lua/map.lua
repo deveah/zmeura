@@ -85,9 +85,17 @@ function Map:setTile(x, y, tile)
   self.tile[x][y] = tile
   
   --  update modifier tables
+  self.modifier[x][y] = {}
 
   --  the hit points are reset to default
-  self.modifier[x][y].hitPoints = self.tile[x][y].hitPoints
+  if self.tile[x][y].hitPoints then
+    self.modifier[x][y].hitPoints = self.tile[x][y].hitPoints
+  end
+
+  --  the uses are set to maximum
+  if self.tile[x][y].uses then
+    self.modifier[x][y].uses = self.tile[x][y].uses
+  end
 end
 
 --  Map:isSolid - checks if a position on the map is solid (blocks movement)
@@ -158,6 +166,30 @@ function Map:damageTile(x, y, quantity)
   end
 end
 
+--  Map:getTileUses - returns the number of uses left in a tile
+--  x, y: the coordinates of the tile
+function Map:getTileUses(x, y)
+  if not self:isLegal(x, y) then
+    return nil
+  end
+
+  if not self.modifier[x][y].uses then
+    return nil
+  end
+
+  return self.modifier[x][y].uses
+end
+
+--  Map:modifyTileUses - changes the amount of uses a tile has left by a
+--  specified amount; doesn't check for anything but bounds
+--  quantity: the amount to modify by; can be either positive or negative
+function Map:modifyTileUses(x, y, quantity)
+  if not self:isLegal(x, y) then
+    return false
+  end
+
+  self.modifier[x][y].uses = self.modifier[x][y].uses + quantity
+end
 return Map
 
 -- vim: set ts=2 sw=2:
