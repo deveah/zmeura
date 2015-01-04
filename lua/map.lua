@@ -181,7 +181,8 @@ function Map:getTileUses(x, y)
 end
 
 --  Map:modifyTileUses - changes the amount of uses a tile has left by a
---  specified amount; doesn't check for anything but bounds
+--  specified amount; doesn't check for anything but bounds; returns true if
+--  the tile has been changed to something else, and false otherwise
 --  quantity: the amount to modify by; can be either positive or negative
 function Map:modifyTileUses(x, y, quantity)
   if not self:isLegal(x, y) then
@@ -189,7 +190,28 @@ function Map:modifyTileUses(x, y, quantity)
   end
 
   self.modifier[x][y].uses = self.modifier[x][y].uses + quantity
+
+  --  if the tile is out of uses, transform it
+  if self.modifier[x][y].uses <= 0 then
+    local t = self:getTile(x, y)
+    if t.name == "Berry bush" then
+      self:setTile(x, y, Terrain["bush"])
+      return true
+    end
+    if t.name == "Puddle" then
+      --  20% chance to turn into dirt, 80% chance to turn into grass
+      if math.random() < 0.2 then
+        self:setTile(x, y, Terrain["dirt"])
+      else
+        self:setTile(x, y, Terrain["grass"])
+      end
+      return true
+    end
+  end
+
+  return false
 end
+
 return Map
 
 -- vim: set ts=2 sw=2:

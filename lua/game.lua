@@ -7,6 +7,7 @@ local Global = require "lua/global"
 local Map = require "lua/map"
 local Mapgen = require "lua/mapgen"
 local Terrain = require "lua/terrain"
+local Weather = require "lua/weather"
 
 local Game = {}
 Game.__index = Game
@@ -88,6 +89,9 @@ function Game:initialize()
   --  greet the player!
   self:announce("Welcome! Please don't die often.")
 
+  --  create a Weather object
+  self.weather = Weather.new(self, tempMap, "sunny")
+
   --  everything's all right, so continue the flow
   return true
 end
@@ -101,6 +105,10 @@ function Game:loop()
 
   --  loop through all the actors inside actorList, giving them a chance to act
   while self.running do
+    --  update the weather
+    self.weather:takeEffect()
+    self.weather:cycle()
+
     for i = 1, #(self.actorList) do
       local a = self.actorList[i]
       self.log:write("Actor " .. tostring(a) .. " now acting.\n")
@@ -216,6 +224,12 @@ function Game:drawMainScreen()
     curses.clrtoeol()
   end
 
+  --  clear the area to the right of the viewport
+  for i = 0, Global.viewportHeight do
+    curses.move(Global.viewportWidth, i)
+    curses.clrtoeol()
+  end
+
   --  draw the terrain
   for i = self.cameraX, self.cameraX + Global.viewportWidth - 1 do
     for j = self.cameraY, self.cameraY + Global.viewportHeight - 1 do
@@ -264,6 +278,7 @@ function Game:drawMainScreen()
 
   curses.write(Global.viewportWidth, 3, "Thirst: " .. self.player.thirst .. "%")
   curses.write(Global.viewportWidth + 20, 3, "Hunger: " .. self.player.hunger .. "%")
+  curses.write(Global.viewportWidth, 4, "Weather: " .. self.weather.state)
 
   --  draw the last five messages
   for i = 0, 4 do

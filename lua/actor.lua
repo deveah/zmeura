@@ -279,15 +279,9 @@ function Actor:useTerrain()
 
     --  you can't drink from a pond ad infinitum, so decrease the number of
     --  uses this terrain tile still has
-    self.map:modifyTileUses(self.x, self.y, -1)
-    if self.map:getTileUses(self.x, self.y) <= 0 then
-      --  the puddle is no more; turn it into dirt
-      self.map:setTile(self.x, self.y, Terrain["dirt"])
-
-      --  let the user know there no longer is a pond here
-      if self.isPlayer then
-        self.gameInstance:announce("The pond has vanished.")
-      end
+    local oldTile = self.map:getTile(self.x, self.y)
+    if self.map:modifyTileUses(self.x, self.y, -1) and self.isPlayer then
+      self.gameInstance:announce("The pond has vanished.")
     end
 
     --  the action has been successfully taken care of
