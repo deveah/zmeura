@@ -8,6 +8,24 @@
 
     Right now you can wander around a small-ish map and destroy trees.
 
+    List of done things
+    --
+
+    1.  Scrolling map
+    2.  Movement
+    3.  Naive forest generation
+    4.  Thirst (basic, non-lethal)
+    5.  Hunger (basic, non-lethal)
+
+    List of things to do
+    --
+
+    0.  A purpose to all of this
+    1.  Other actors (both peaceful and less peaceful)
+    2.  Death
+    3.  Items
+    4.  Inventory
+
     How to compile
     --
 
