@@ -30,10 +30,72 @@ function Actor.new(name, face, color)
   a.y = 0
   a.map = nil
 
+  --  the sightMap is an array as big as the map the actor currently is on,
+  --  and holds information about the visibility of the tiles
+  a.sightMap = nil
+
   --  the game instance this actor is attached to
   a.gameInstance = nil
 
   return a
+end
+
+--  Actor:resetSightMap - resizes the sight map to fit the map the actor
+--  currently is on, setting everything to 'not seen'
+function Actor:resetSightMap()
+  self.sightMap = {}
+  for i = 1, self.map.width do
+    self.sightMap[i] = {}
+    for j = 1, self.map.height do
+      self.sightMap[i][j] = false
+    end
+  end
+end
+
+--  Actor:updateFieldOfView - resets the actor's sight map, and then
+--  recalculates the field of view
+function Actor:updateFieldOfView()
+  --  doRay - trace a ray from (startX, startY) at an angle of `angle'
+  --  over a distance of `distance'; tracing stops when the ray hits either
+  --  an out-of-bounds tile, or an opaque one
+  local function doRay(startX, startY, angle, distance)
+    --  a tile's center is at (+0.5, +0.5)
+    local cx, cy = startX + 0.5, startY + 0.5
+    local dx = math.cos(angle * math.pi / 180)
+    local dy = math.sin(angle * math.pi / 180)
+
+    --  starting position is always visible
+    self.sightMap[startX][startY] = true
+      
+    for i = 1, distance do
+      cx = cx + dx
+      cy = cy + dy
+
+      if not self.map:isLegal(math.floor(cx), math.floor(cy)) then
+        return false
+      end
+
+      --  mark that this tile can be seen from the actor's point of view
+      self.sightMap[math.floor(cx)][math.floor(cy)] = true
+
+      --  the player's sight map has memory, so be sure to update the memory
+      if self.isPlayer then
+        self.map.memory[math.floor(cx)][math.floor(cy)] = self.map.tile[math.floor(cx)][math.floor(cy)]
+      end
+
+      if self.map:isOpaque(math.floor(cx), math.floor(cy)) then
+        return false
+      end
+    end
+  end
+
+  --  clear the old sight map
+  self:resetSightMap()
+
+  --  trace rays in a circle using 1 degree increments
+  for i = 0, 360, 0.1 do
+    doRay(self.x, self.y, i, 10)
+  end
 end
 
 --  Actor:handleKey - acts according to the key provided; returns true if the

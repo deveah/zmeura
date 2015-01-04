@@ -22,10 +22,16 @@ function Map.new(width, height)
 
   --  terrain data
   m.tile = {}
+
+  --  memory data - what the player has seen before
+  m.memory = {}
+
   for i = 1, width do
     m.tile[i] = {}
+    m.memory[i] = {}
     for j = 1, height do
       m.tile[i][j] = {}
+      m.memory[i][j] = {}
     end
   end
 
@@ -61,7 +67,7 @@ function Map:setTile(x, y, tile)
   self.tile[x][y] = tile
 end
 
---  Map:isSolid - checks if a position on the map is solid
+--  Map:isSolid - checks if a position on the map is solid (blocks movement)
 --  x, y: the coordinates of the tile
 function Map:isSolid(x, y)
   --  an out-of-bounds tile is considered solid
@@ -71,6 +77,18 @@ function Map:isSolid(x, y)
 
   --  return the tile's 'solid' characteristic
   return self.tile[x][y].solid
+end
+
+--  Map:isOpaque - checks if a position on the map is opaque (blocks vision)
+--  x, y: the coordinates of the tile
+function Map:isOpaque(x, y)
+  --  an out-of-bounds tile is considered opaque
+  if not self:isLegal(x, y) then
+    return true
+  end
+
+  --  return the tile's 'opaque' characteristic
+  return self.tile[x][y].opaque
 end
 
 --  Map:fill - fills the whole map with a single terrain tile

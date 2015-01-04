@@ -192,11 +192,10 @@ function Game:drawMainScreen()
   --  shortcut to currently drawn map
   local m = self.player.map
 
-  --  clear the window for a new draw
-  curses.clear()
-
   --  update the camera coordinates to center on the player
   self:updateCamera(self.player.x, self.player.y)
+
+  self.player:updateFieldOfView()
 
   --  draw the terrain
   for i = self.cameraX, self.cameraX + Global.viewportWidth - 1 do
@@ -205,8 +204,19 @@ function Game:drawMainScreen()
 
       --  don't draw anything if it's out of bounds
       if t then
-        curses.attr(t.color)
-        curses.write(i - self.cameraX, j - self.cameraY, t.face)
+        if self.player.sightMap[i][j] then
+          --  if the tile is in the field of view, draw it as it is
+          curses.attr(t.color)
+          curses.write(i - self.cameraX, j - self.cameraY, t.face)
+        elseif self.player.map.memory[i][j] then
+          --  if the tile is not in view, but has been seen, draw it from memory
+          curses.attr(curses.black + curses.bold)
+          curses.write(i - self.cameraX, j - self.cameraY, self.player.map.memory[i][j].face)
+        else
+          --  nothing is known about this position, so draw nothing
+          curses.attr(curses.white)
+          curses.write(i - self.cameraX, j - self.cameraY, " ")
+        end
       end
     end
   end
@@ -216,7 +226,8 @@ function Game:drawMainScreen()
     local a = self.actorList[i]
 
     --  draw only if the actor is on the same map as the player, and in view
-    if a.map == self.player.map and self:coordinateInView(a.x, a.y) then
+    if  a.map == self.player.map and self:coordinateInView(a.x, a.y) and
+        self.player.sightMap[a.x][a.y] then
       curses.attr(a.color)
       curses.write(a.x - self.cameraX, a.y - self.cameraY, a.face)
     end
@@ -263,7 +274,7 @@ end
 
 --  Game:lookAt - enters 'look mode', which allows the user to look around
 --  with the same keys as used for player movement; looking is limited to the
---  insides of the current viewport
+--  insides of the player's field of view
 --  x, y: the position the looking starts from
 function Game:lookAt(x, y)
   --  current coordinates
@@ -283,11 +294,11 @@ function Game:lookAt(x, y)
     curses.attr(curses.yellow)
     curses.write(0, Global.viewportHeight, "Looking (q to quit)")
     curses.attr(curses.white)
-    if t then
+    if t and self.player.sightMap[cx][cy] then
       curses.write(0, Global.viewportHeight+1, "Tile: " .. t.name)
       curses.write(0, Global.viewportHeight+2, t.description)
     else
-      curses.write(0, Global.viewportHeight+1, "Tile out of bounds.")
+      curses.write(0, Global.viewportHeight+1, "I can't see what's there.")
     end
 
     --  center the cursor on the examined position

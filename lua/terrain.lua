@@ -11,22 +11,6 @@ return {
     solid = true,
     opaque = false
   },
-  ["floor"] = {
-    name = "Floor",
-    description = "You walk on it. It's that simple.",
-    face = ".",
-    color = curses.white,
-    solid = false,
-    opaque = false
-  },
-  ["wall"] = {
-    name = "Wall",
-    description = "A solid, concrete wall.",
-    face = "#",
-    color = curses.white,
-    solid = true,
-    opaque = true
-  },
   ["grass"] = {
     name = "Grass",
     description = "Green grass.",
@@ -41,7 +25,7 @@ return {
     face = ";",
     color = curses.green,
     solid = false,
-    opaque = true
+    opaque = false
   },
   ["dirt"] = {
     name = "Dirt",
@@ -65,7 +49,7 @@ return {
     face = "1",
     color = curses.green + curses.bold,
     solid = true,
-    opaque = false
+    opaque = true
   }
 }
 
