@@ -3,7 +3,32 @@
     (c) 2015, Vlad Dumitru. See LICENCE for details.
     --
 
-    Zmeura is a roguelike based on mazga (http://github.com/deveah/mazga).
+    Zmeura is an open-world, coffeebreak roguelike written using the mazga
+    (http://github.com/deveah/mazga) minimal roguelike framework.
 
-    Stay tuned for something more explanatory.
+    Right now you can wander around a small-ish map and destroy trees.
+
+    How to compile
+    --
+
+    Building requires development headers for Lua (preferably 5.2) and some
+    flavour of curses.
+
+    To build the game,
+    $ make
+    
+    And then to run,
+    $ ./zmeura
+
+
+    Contributing
+    --
+
+    Contributing is highly appreciated, since it diminishes the chances of
+    this project to become vapourware.
+
+    Please submit your ideas, bugs, or improvements, either on GitHub
+    (http://github.com/deveah/zmeura), or via mail (deveah at gmail)
+
+    Thanks!
 
