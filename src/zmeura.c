@@ -188,6 +188,15 @@ static int curses_getstr( lua_State *L )
 	return 1;
 }
 
+static int curses_clrtoeol( lua_State *L )
+{
+    (void) L;
+
+    clrtoeol();
+    
+    return 0;
+}
+
 void init_constants( lua_State *L )
 {
 	lua_getglobal( L, "curses" );
@@ -237,6 +246,7 @@ luaL_Reg curses[] = {
 	{	"move",			curses_move },
 	{	"cursor",		curses_cursor },
 	{	"getstr",		curses_getstr },
+    {   "clrtoeol",     curses_clrtoeol },
 	{	NULL,			NULL }
 };
 

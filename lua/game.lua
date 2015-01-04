@@ -197,6 +197,13 @@ function Game:drawMainScreen()
 
   self.player:updateFieldOfView()
 
+  --  clear the area that holds messages (so they won't overlap on successive
+  --  drawings)
+  for i = Global.viewportHeight, Global.minimalTerminalWidth do
+    curses.move(0, i)
+    curses.clrtoeol()
+  end
+
   --  draw the terrain
   for i = self.cameraX, self.cameraX + Global.viewportWidth - 1 do
     for j = self.cameraY, self.cameraY + Global.viewportHeight - 1 do
