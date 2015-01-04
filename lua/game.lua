@@ -3,6 +3,7 @@
 --  Game prototype and related functions
 
 local Actor = require "lua/actor"
+local Global = require "lua/global"
 local Map = require "lua/map"
 local Mapgen = require "lua/mapgen"
 local Terrain = require "lua/terrain"
@@ -49,7 +50,8 @@ function Game:initialize()
 
   --  we need at least an 80x25 terminal to work, so exit if that requirement
   --  isn't met, and let the user know of this issue
-  if self.terminalWidth < 80 or self.terminalHeight < 25 then
+  if  self.terminalWidth < Global.minimalTerminalWidth or
+      self.terminalHeight < Global.minimalTerminalHeight then
     curses.terminate()
     print("Terminal window should be at least 80x25.")
     return false
@@ -77,8 +79,8 @@ function Game:initialize()
   --  its coordinates designate the position which corresponds to the
   --  uppermost, leftmost square drawn;
   --  we center the camera on the player
-  self.cameraX = self.player.x - 30
-  self.cameraY = self.player.y - 10
+  self.cameraX = self.player.x - math.floor(Global.viewportWidth/2)
+  self.cameraY = self.player.y - math.floor(Global.viewportHeight/2)
 
   --  everything's all right, so continue the flow
   return true
@@ -196,9 +198,9 @@ function Game:drawMainScreen()
   --  update the camera coordinates to center on the player
   self:updateCamera(self.player.x, self.player.y)
 
-  --  draw the map display, which is 60x20, and scrolling
-  for i = self.cameraX, self.cameraX + 59 do
-    for j = self.cameraY, self.cameraY + 19 do
+  --  draw the terrain
+  for i = self.cameraX, self.cameraX + Global.viewportWidth - 1 do
+    for j = self.cameraY, self.cameraY + Global.viewportHeight - 1 do
       local t = m:getTile(i, j)
 
       --  don't draw anything if it's out of bounds
@@ -236,19 +238,16 @@ end
 --  square in any direction per call, to give the sensation of scrolling
 --  x, y: position to move the camera towards
 function Game:updateCamera(x, y)
-  --  these margins designate the 'center' zone of the view
-  local upperMargin, lowerMargin, leftMargin, rightMargin = 5, 15, 20, 40
-
-  if x - self.cameraX < leftMargin then
+  if x - self.cameraX < Global.viewportLeftMargin then
     self.cameraX = self.cameraX - 1
   end
-  if x - self.cameraX > rightMargin then
+  if x - self.cameraX > Global.viewportRightMargin then
     self.cameraX = self.cameraX + 1
   end
-  if y - self.cameraY < upperMargin then
+  if y - self.cameraY < Global.viewportUpperMargin then
     self.cameraY = self.cameraY - 1
   end
-  if y - self.cameraY > lowerMargin then
+  if y - self.cameraY > Global.viewportLowerMargin then
     self.cameraY = self.cameraY + 1
   end
 end
@@ -258,7 +257,8 @@ end
 --  x, y: the position to check
 function Game:coordinateInView(x, y)
   return (  x >= self.cameraX and y >= self.cameraY and
-            x < self.cameraX + 60 and y < self.cameraY + 20)
+            x < self.cameraX + Global.viewportWidth and
+            y < self.cameraY + Global.viewportHeight)
 end
 
 --  Game:lookAt - enters 'look mode', which allows the user to look around
@@ -281,13 +281,13 @@ function Game:lookAt(x, y)
 
     --  draw examination details
     curses.attr(curses.yellow)
-    curses.write(0, 20, "Looking (q to quit)")
+    curses.write(0, Global.viewportHeight, "Looking (q to quit)")
     curses.attr(curses.white)
     if t then
-      curses.write(0, 21, "Tile: " .. t.name)
-      curses.write(0, 22, t.description)
+      curses.write(0, Global.viewportHeight+1, "Tile: " .. t.name)
+      curses.write(0, Global.viewportHeight+2, t.description)
     else
-      curses.write(0, 21, "Tile out of bounds.")
+      curses.write(0, Global.viewportHeight+1, "Tile out of bounds.")
     end
 
     --  center the cursor on the examined position
@@ -300,7 +300,7 @@ function Game:lookAt(x, y)
       end
     end
     if k == "j" then
-      if cy < self.cameraY + 19 then
+      if cy < self.cameraY + Global.viewportHeight - 1 then
         cy = cy + 1
       end
     end
@@ -310,7 +310,7 @@ function Game:lookAt(x, y)
       end
     end
     if k == "l" then
-      if cx < self.cameraX + 59 then
+      if cx < self.cameraX + Global.viewportWidth - 1 then
         cx = cx + 1
       end
     end
