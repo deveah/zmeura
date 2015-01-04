@@ -87,7 +87,7 @@ function Game:initialize()
   self.cameraY = self.player.y - math.floor(Global.viewportHeight/2)
 
   --  greet the player!
-  self:announce("Welcome! Please don't die often.")
+  self:announce("Welcome! Please don't die often.", curses.green)
 
   --  create a Weather object
   self.weather = Weather.new(self, tempMap, "sunny")
@@ -284,6 +284,7 @@ function Game:drawMainScreen()
   for i = 0, 4 do
     local message = self.messageLog[#(self.messageLog) - i]
     if message then
+			curses.attr(message.color)
       if message.repeats == 1 then
         curses.write(0, Global.viewportHeight + i, message.text)
       else
@@ -383,13 +384,18 @@ end
 
 --  Game:announce - adds a message into the log, so the user can receive
 --  feedback; also manages multiple, similar messages
---  message: the string to add to the log
-function Game:announce(message)
+--  message:	the string to add to the log
+--	color:		the color the message should have
+function Game:announce(message, color)
+	--	by default, the color is white
+	color = color or curses.white
+
   --  this is the first message announce, so don't bother checking for previous
   --  similar messages
   if #self.messageLog == 0 then
     table.insert(self.messageLog, {
       text = message,
+			color = color,
       repeats = 1
     })
     return true
@@ -403,6 +409,7 @@ function Game:announce(message)
     --  if the messages aren't similar, add the message with a counter of one
     table.insert(self.messageLog, {
       text = message,
+			color = color,
       repeats = 1
     })
   end
