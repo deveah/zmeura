@@ -201,22 +201,27 @@ function Game:drawMainScreen()
   for i = self.cameraX, self.cameraX + Global.viewportWidth - 1 do
     for j = self.cameraY, self.cameraY + Global.viewportHeight - 1 do
       local t = m:getTile(i, j)
+      local mt = m:getMemorisedTile(i, j)
 
       --  don't draw anything if it's out of bounds
       if t then
-        if self.player.sightMap[i][j] then
+        if self.player:inSight(i, j) then
           --  if the tile is in the field of view, draw it as it is
           curses.attr(t.color)
           curses.write(i - self.cameraX, j - self.cameraY, t.face)
-        elseif self.player.map.memory[i][j] then
+        elseif mt then
           --  if the tile is not in view, but has been seen, draw it from memory
           curses.attr(curses.black + curses.bold)
-          curses.write(i - self.cameraX, j - self.cameraY, self.player.map.memory[i][j].face)
+          curses.write(i - self.cameraX, j - self.cameraY, mt.face)
         else
-          --  nothing is known about this position, so draw nothing
+          --  nothing is known about this tile, so draw nothing
           curses.attr(curses.white)
           curses.write(i - self.cameraX, j - self.cameraY, " ")
         end
+      else
+        --  tile is out of bounds, so draw nothing
+        curses.attr(curses.white)
+        curses.write(i - self.cameraX, j - self.cameraY, " ")
       end
     end
   end
@@ -227,7 +232,7 @@ function Game:drawMainScreen()
 
     --  draw only if the actor is on the same map as the player, and in view
     if  a.map == self.player.map and self:coordinateInView(a.x, a.y) and
-        self.player.sightMap[a.x][a.y] then
+        self.player:inSight(a.x, a.y) then
       curses.attr(a.color)
       curses.write(a.x - self.cameraX, a.y - self.cameraY, a.face)
     end

@@ -30,8 +30,8 @@ function Map.new(width, height)
     m.tile[i] = {}
     m.memory[i] = {}
     for j = 1, height do
-      m.tile[i][j] = {}
-      m.memory[i][j] = {}
+      m.tile[i][j] = nil
+      m.memory[i][j] = nil
     end
   end
 
@@ -53,6 +53,17 @@ function Map:getTile(x, y)
   end
 
   return self.tile[x][y]
+end
+
+--  Map:getMemorisedTile - returns the tile at position (x, y) from memory,
+--  or nil, if the coordinates are out of bounds
+--  x, y: the coordinates
+function Map:getMemorisedTile(x, y)
+  if not self:isLegal(x, y) then
+    return nil
+  end
+
+  return self.memory[x][y]
 end
 
 --  Map:setTile - sets the tile at position (x, y); if the coordinates are out

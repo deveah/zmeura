@@ -98,6 +98,18 @@ function Actor:updateFieldOfView()
   end
 end
 
+--  Actor:inSight - checks whether the point (x, y) is seen from the actor's
+--  point of view
+--  x, y: coordinates of the point
+function Actor:inSight(x, y)
+  --  nonexistant tiles cannot be seen
+  if not self.map:isLegal(x, y) then
+    return false
+  end
+
+  return self.sightMap[x][y]
+end
+
 --  Actor:handleKey - acts according to the key provided; returns true if the
 --  action has been successfully performed, or false otherwise
 --  key: the key to translate into an action
