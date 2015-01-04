@@ -168,7 +168,7 @@ end
 --  map: the map to be added
 function Game:addMap(map)
   table.insert(self.mapList, map)
-  map.gameInstance = map
+  map.gameInstance = self
 end
 
 --  Game:removeMap - removes a map from a Game object's map list; same

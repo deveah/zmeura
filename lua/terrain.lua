@@ -9,7 +9,8 @@ return {
     face = " ",
     color = curses.black,
     solid = true,
-    opaque = false
+    opaque = false,
+    breakable = false
   },
   ["grass"] = {
     name = "Grass",
@@ -17,7 +18,8 @@ return {
     face = ".",
     color = curses.green,
     solid = false,
-    opaque = false
+    opaque = false,
+    breakable = false
   },
   ["tall-grass"] = {
     name = "Tall grass",
@@ -25,7 +27,8 @@ return {
     face = ";",
     color = curses.green,
     solid = false,
-    opaque = true
+    opaque = true,
+    breakable = false
   },
   ["dirt"] = {
     name = "Dirt",
@@ -33,7 +36,8 @@ return {
     face = ".",
     color = curses.yellow,
     solid = false,
-    opaque = false
+    opaque = false,
+    breakable = false
   },
   ["tree"] = {
     name = "Tree",
@@ -41,7 +45,10 @@ return {
     face = "7",
     color = curses.green,
     solid = true,
-    opaque = false
+    opaque = true,
+    breakable = true,
+    hitPoints = 10,
+    breaksInto = "dirt"
   },
   ["small-tree"] = {
     name = "Small tree",
@@ -49,7 +56,10 @@ return {
     face = "1",
     color = curses.green + curses.bold,
     solid = true,
-    opaque = true
+    opaque = false,
+    breakable = true,
+    hitPoints = 3,
+    breaksInto = "dirt"
   }
 }
 

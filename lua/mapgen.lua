@@ -12,7 +12,7 @@ local Mapgen = {}
 function Mapgen.fill(map, tile)
   for i = 1, map.width do
     for j = 1, map.height do
-      map.tile[i][j] = tile
+      map:setTile(i, j, tile)
     end
   end
 end
@@ -44,17 +44,17 @@ function Mapgen.forest(map, treeDensity, grassDensity)
     for j = 1, map.height do
       if math.random() < treeDensity then
         if math.random() < 0.5 then
-          map.tile[i][j] = Terrain["tree"]
+          map:setTile(i, j, Terrain["tree"])
         else
-          map.tile[i][j] = Terrain["small-tree"]
+          map:setTile(i, j, Terrain["small-tree"])
         end
       else
-        map.tile[i][j] = Terrain["dirt"]
+        map:setTile(i, j, Terrain["dirt"])
         if math.random() < grassDensity then
           if math.random() < 0.8 then
-            map.tile[i][j] = Terrain["grass"]
+            map:setTile(i, j, Terrain["grass"])
           else
-            map.tile[i][j] = Terrain["tall-grass"]
+            map:setTile(i, j, Terrain["tall-grass"])
           end
         end
       end

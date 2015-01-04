@@ -173,14 +173,20 @@ function Actor:moveRelative(dx, dy)
 
   --  check if the desired coordinate is not solid (it can be moved upon)
   if self.map:isSolid(self.x+dx, self.y+dy) then
-    L:write("\tActor tried to move onto a solid tile.\n")
+    if self.map:isBreakable(self.x+dx, self.y+dy) then
+      L:write("\tActor hit " .. self.map:getTile(self.x+dx, self.y+dy).name .. ".\n")
+      self.map:damageTile(self.x+dx, self.y+dy, 1)
+      return true
+    end
+
+    L:write("\tActor tried to move onto a solid, unbreakable tile.\n")
     return false
   end
 
   --  finally, update the actor's coordinates and return that it has moved
   self.x = self.x + dx
   self.y = self.y + dy
-  L:write("Ok.\n")
+  L:write("\tOk.\n")
   return true
 end
 
