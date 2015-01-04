@@ -65,7 +65,7 @@ function Game:initialize()
 
   --  create an empty map (filled with floor tiles), and place it into the map list
   local tempMap = Map.new(100, 100)
-  Mapgen.forest(tempMap, 0.2, 0.8, 0.01)
+  Mapgen.forest(tempMap, 0.2, 0.8, 0.01, 0.005)
   self:addMap(tempMap)
 
   --  create the player
@@ -263,6 +263,7 @@ function Game:drawMainScreen()
   curses.write(Global.viewportWidth, 1, "Camera: " .. self.cameraX .. ", " .. self.cameraY)
 
   curses.write(Global.viewportWidth, 3, "Thirst: " .. self.player.thirst .. "%")
+  curses.write(Global.viewportWidth + 20, 3, "Hunger: " .. self.player.hunger .. "%")
 
   --  draw the last five messages
   for i = 0, 4 do

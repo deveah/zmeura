@@ -2,6 +2,14 @@
 --  terrain.lua
 --  Terrain data.
 
+--  flag/attribute explanation:
+--  solid: blocks movement
+--  opaque: blocks vision
+--  breakable: (only if solid) whether or not the tile can be destroyed
+--    hitPoints: the amount of damage needed to break it
+--    breaksInto: the tile it transforms into when broken
+--  uses: the number of uses the tile holds (see Actor:useTerrain)
+
 return {
   ["void"] = {
     name = "Void",
@@ -9,8 +17,7 @@ return {
     face = " ",
     color = curses.black,
     solid = true,
-    opaque = false,
-    breakable = false
+    opaque = false
   },
   ["grass"] = {
     name = "Grass",
@@ -18,8 +25,7 @@ return {
     face = ".",
     color = curses.green,
     solid = false,
-    opaque = false,
-    breakable = false
+    opaque = false
   },
   ["tall-grass"] = {
     name = "Tall grass",
@@ -27,8 +33,7 @@ return {
     face = ";",
     color = curses.green,
     solid = false,
-    opaque = true,
-    breakable = false
+    opaque = true
   },
   ["dirt"] = {
     name = "Dirt",
@@ -36,8 +41,7 @@ return {
     face = ".",
     color = curses.yellow,
     solid = false,
-    opaque = false,
-    breakable = false
+    opaque = false
   },
   ["tree"] = {
     name = "Tree",
@@ -68,8 +72,24 @@ return {
     color = curses.blue,
     solid = false,
     opaque = false,
-    breakable = false,
     uses = 3  -- you can drink three times from a puddle before it vanishes
+  },
+  ["berry-bush"] = {
+    name = "Berry bush",
+    description = "A bush containing some kind of berries. I bet they're edible.",
+    face = "%",
+    color = curses.magenta,
+    solid = false,
+    opaque = true
+    --  the berry bush can only be used once, so don't bother memorising uses
+  },
+  ["bush"] = {
+    name = "Bush",
+    description = "A berry bush, although it has no berries right now.",
+    face = "%",
+    color = curses.green,
+    solid = false,
+    opaque = true
   }
 }
 

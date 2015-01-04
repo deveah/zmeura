@@ -36,11 +36,12 @@ function Mapgen.randomFill(map)
 end
 
 --  Mapgen.forest - generates a forest on the provided map
---  map:            the map to work on
---  treeDensity:    chance to place a tree
---  grassDensity:   chance to place grass (place dirt otherwise)
---  puddleDensity:  chance to place a puddle of water
-function Mapgen.forest(map, treeDensity, grassDensity, puddleDensity)
+--  map:              the map to work on
+--  treeDensity:      chance to place a tree
+--  grassDensity:     chance to place grass (place dirt otherwise)
+--  puddleDensity:    chance to place a puddle of water
+--  berryBushDensity: chance to place a berry bush
+function Mapgen.forest(map, treeDensity, grassDensity, puddleDensity, berryBushDensity)
   for i = 1, map.width do
     for j = 1, map.height do
       if math.random() < treeDensity then
@@ -58,12 +59,19 @@ function Mapgen.forest(map, treeDensity, grassDensity, puddleDensity)
             map:setTile(i, j, Terrain["tall-grass"])
           end
         end
+      end
+    end
+  end
 
-        --  puddles are much rarer than grass or dirt, so putting a puddle on
-        --  top of a dirt/grass tile doesn't affect their densities much
-        if math.random() < puddleDensity then
-          map:setTile(i, j, Terrain["puddle"])
-        end
+  --  puddles and bushes come over the layer of grass, and since they're pretty
+  --  rare, they don't affect much the densities of grass/dirt
+  for i = 1, map.width do
+    for j = 1, map.height do
+      if math.random() < puddleDensity then
+        map:setTile(i, j, Terrain["puddle"])
+      end
+      if math.random() < berryBushDensity then
+        map:setTile(i, j, Terrain["berry-bush"])
       end
     end
   end

@@ -41,6 +41,10 @@ function Actor.new(name, face, color)
   --  0 means 'not thirsty', 100 means 'maximum thirst'
   a.thirst = 0
 
+  --  hunger: replenishes when eating
+  --  0 means 'not hungry', 100 means 'maximum hunger'
+  a.hunger = 0
+
   --  the sightMap is an array as big as the map the actor currently is on,
   --  and holds information about the visibility of the tiles
   a.sightMap = nil
@@ -57,6 +61,11 @@ function Actor:updateStats()
   --  thirst increases once every 10 turns
   if self.turns % 10 == 0 then
     self:modifyThirst(1)
+  end
+
+  --  hunger increases once every 15 turns
+  if self.turns % 15 == 0 then
+    self:modifyHunger(1)
   end
 end
 
@@ -241,6 +250,20 @@ function Actor:modifyThirst(quantity)
   end
 end
 
+--  Actor:modifyHunger - modifies the actor's hunger value
+--  quantity: can be either negative (replenishing) or positive
+function Actor:modifyHunger(quantity)
+  self.hunger = self.hunger + quantity
+
+  --  clip the value between 0 and 100
+  if self.hunger < 0 then
+    self.hunger = 0
+  end
+  if self.hunger > 100 then
+    self.hunger = 100
+  end
+end
+
 --  Actor:useTerrain - uses the terrain tile the actor is currently on
 function Actor:useTerrain()
   local t = self.map:getTile(self.x, self.y)
@@ -269,6 +292,18 @@ function Actor:useTerrain()
 
     --  the action has been successfully taken care of
     return true
+  elseif t.name == "Berry bush" then
+    --  using a berry bush means eating the berries from it; this is a one-time
+    --  deal; the tile then transforms into a regular, berry-less bush
+    --  berries replenish 1% hunger
+    self:modifyHunger(-1)
+
+    if self.isPlayer then
+      self.gameInstance:announce("You eat the berries.")
+    end
+
+    --  de-berry the bush
+    self.map:setTile(self.x, self.y, Terrain["bush"])
   else
     --  there's no use for such tile, so announce this issue
     if self.isPlayer then
