@@ -62,7 +62,7 @@ function Game:initialize()
 
   --  create an empty map (filled with floor tiles), and place it into the map list
   local tempMap = Map.new(100, 100)
-  Mapgen.randomFill(tempMap)
+  Mapgen.forest(tempMap, 0.2, 0.8)
   self:addMap(tempMap)
 
   --  create the player

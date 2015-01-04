@@ -102,16 +102,6 @@ function Map:isOpaque(x, y)
   return self.tile[x][y].opaque
 end
 
---  Map:fill - fills the whole map with a single terrain tile
---  tile: which tile to fill the map with
-function Map:fill(tile)
-  for i = 1, self.width do
-    for j = 1, self.height do
-      self.tile[i][j] = tile
-    end
-  end
-end
-
 return Map
 
 -- vim: set ts=2 sw=2:

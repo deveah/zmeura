@@ -25,7 +25,7 @@ return {
     face = ";",
     color = curses.green,
     solid = false,
-    opaque = false
+    opaque = true
   },
   ["dirt"] = {
     name = "Dirt",
@@ -41,7 +41,7 @@ return {
     face = "7",
     color = curses.green,
     solid = true,
-    opaque = true
+    opaque = false
   },
   ["small-tree"] = {
     name = "Small tree",
