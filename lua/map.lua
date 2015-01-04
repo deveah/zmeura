@@ -127,7 +127,8 @@ function Map:isOpaque(x, y)
 end
 
 --  Map:damageTile - damages a tile; if the tile remains out of hit points,
---  transforms it into its 'damaged' variant
+--  transforms it into its 'damaged' variant; returns true if the terrain has
+--  been destroyed, and false otherwise
 --  x, y:     the coordinates of the tile to receive damage
 --  quantity: how much damage to deal
 function Map:damageTile(x, y, quantity)
@@ -153,6 +154,7 @@ function Map:damageTile(x, y, quantity)
       ") of map " .. tostring(self) .. " broke into " ..
       self:getTile(x, y).breaksInto .. ".\n")
     self:setTile(x, y, Terrain[self:getTile(x, y).breaksInto])
+    return true
   end
 end
 

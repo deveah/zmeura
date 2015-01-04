@@ -39,6 +39,9 @@ function Game:initialize()
   self.itemList = {}
   self.mapList = {}
 
+  --  message log
+  self.messageLog = {}
+
   --  this tells us if the game is currently inside the main loop
   self.running = false
 
@@ -81,6 +84,9 @@ function Game:initialize()
   --  we center the camera on the player
   self.cameraX = self.player.x - math.floor(Global.viewportWidth/2)
   self.cameraY = self.player.y - math.floor(Global.viewportHeight/2)
+
+  --  greet the player!
+  self:announce("Welcome! Please don't die often.")
 
   --  everything's all right, so continue the flow
   return true
@@ -250,6 +256,19 @@ function Game:drawMainScreen()
   curses.write(60, 0, "Player: " .. self.player.x .. ", " .. self.player.y)
   curses.write(60, 1, "Camera: " .. self.cameraX .. ", " .. self.cameraY)
 
+  --  draw the last five messages
+  for i = 0, 4 do
+    local message = self.messageLog[#(self.messageLog) - i]
+    if message then
+      if message.repeats == 1 then
+        curses.write(0, Global.viewportHeight + i, message.text)
+      else
+        curses.write(0, Global.viewportHeight + i, message.text ..
+          " (x" .. message.repeats .. ")")
+      end
+    end
+  end
+
   --  put the cursor on the player
   curses.move(self.player.x - self.cameraX, self.player.y - self.cameraY)
 
@@ -337,6 +356,33 @@ function Game:lookAt(x, y)
         cx = cx + 1
       end
     end
+  end
+end
+
+--  Game:announce - adds a message into the log, so the user can receive
+--  feedback; also manages multiple, similar messages
+--  message: the string to add to the log
+function Game:announce(message)
+  --  this is the first message announce, so don't bother checking for previous
+  --  similar messages
+  if #self.messageLog == 0 then
+    table.insert(self.messageLog, {
+      text = message,
+      repeats = 1
+    })
+    return true
+  end
+
+  if message == self.messageLog[#self.messageLog].text then
+    --  if the message is the same as the last one, collapse them and add a
+    --  counter which tells the user how many times that particular action happened
+    self.messageLog[#self.messageLog].repeats = self.messageLog[#self.messageLog].repeats + 1
+  else
+    --  if the messages aren't similar, add the message with a counter of one
+    table.insert(self.messageLog, {
+      text = message,
+      repeats = 1
+    })
   end
 end
 

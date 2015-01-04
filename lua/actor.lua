@@ -174,8 +174,20 @@ function Actor:moveRelative(dx, dy)
   --  check if the desired coordinate is not solid (it can be moved upon)
   if self.map:isSolid(self.x+dx, self.y+dy) then
     if self.map:isBreakable(self.x+dx, self.y+dy) then
-      L:write("\tActor hit " .. self.map:getTile(self.x+dx, self.y+dy).name .. ".\n")
-      self.map:damageTile(self.x+dx, self.y+dy, 1)
+      local oldName = self.map:getTile(self.x+dx, self.y+dy).name
+
+      --  let the user know he/she is dealing damage to a tree or something
+      if self.isPlayer then
+        self.gameInstance:announce("You hit the " .. oldName .. "!")
+      end
+
+      L:write("\tActor hit " .. oldName .. ".\n")
+      if self.map:damageTile(self.x+dx, self.y+dy, 1) then
+        --  let the user know he/she destroyed the terrain
+        if self.isPlayer then
+          self.gameInstance:announce("You destroy the " .. oldName .. "!")
+        end
+      end
       return true
     end
 
