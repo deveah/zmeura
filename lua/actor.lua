@@ -251,7 +251,7 @@ function Actor:moveRelative(dx, dy)
       if self.map:damageTile(self.x+dx, self.y+dy, 1) then
         --  let the user know he/she destroyed the terrain
         if self.isPlayer then
-          self.gameInstance:announce("You destroy the " .. oldName .. "!")
+          self.gameInstance:announce("You destroy the " .. oldName .. "!", curses.red)
         end
       end
       return true

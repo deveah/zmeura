@@ -69,7 +69,7 @@ function Weather:cycle()
       self.currentTime = 0
 
       --  announce the change of weather
-      self.gameInstance:announce("It started raining.")
+      self.gameInstance:announce("It started raining.", curses.yellow + curses.bold)
       return true
     end
   elseif self.state == "raining" then
@@ -79,7 +79,7 @@ function Weather:cycle()
       self.currentTime = 0
 
       --  announce the change of weather
-      self.gameInstance:announce("It stopped raining.")
+      self.gameInstance:announce("It stopped raining.", curses.yellow + curses.bold)
       return true
     end
   end
