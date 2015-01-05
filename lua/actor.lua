@@ -4,6 +4,8 @@
 --  An actor is a live being who has the right to act when prompted by the
 --  game loop.
 
+local Item = require "lua/item"
+local ItemData = require "lua/itemdata"
 local Terrain = require "lua/terrain"
 
 local Actor = {}
@@ -31,6 +33,9 @@ function Actor.new(name, face, color)
   a.x = 0
   a.y = 0
   a.map = nil
+
+  --  items that the actor holds on itself
+  a.inventory = {}
 
   --  stats
 
@@ -146,7 +151,7 @@ function Actor:handleKey(key)
   local L = self.gameInstance.log
   L:write("Actor " .. tostring(self) .. " handleKey: " .. key .. "\n")
 
-  --  movement keys
+  --  movement
   if key == "h" then
     return self:moveRelative(-1, 0)
   end
@@ -160,7 +165,7 @@ function Actor:handleKey(key)
     return self:moveRelative(1, 0)
   end
 
-  --  look/examine key
+  --  look/examine
   if key == "x" then
     self.gameInstance:lookAt(self.x, self.y)
 
@@ -168,12 +173,39 @@ function Actor:handleKey(key)
     return false
   end
 
-  --  use terrain/apply key
+  --  show inventory
+  if key == "i" then
+    self:showInventory(false)
+
+    --  looking through the inventory doesn't spend a turn
+    return false
+  end
+
+  --  apply item from inventory
   if key == "a" then
+    local it = self:showInventory(true)
+    if not it then
+      --  no item has been selected, so no action has been taken
+      if self.isPlayer then
+        self.gameInstance:announce("Okay, then.")
+      end
+      return false
+    else
+      return self:applyItem(it)
+    end
+  end
+
+  --  pick up item
+  if key == "." then
+    return self:pickUp()
+  end
+
+  --  use terrain
+  if key == "U" then
     return self:useTerrain()
   end
 
-  --  quit key
+  --  quit game
   if key == "q" then
     --  exit the game loop abruptly
     self.gameInstance.running = false
@@ -287,13 +319,12 @@ function Actor:useTerrain()
     --  the action has been successfully taken care of
     return true
   elseif t.name == "Berry bush" then
-    --  using a berry bush means eating the berries from it; this is a one-time
-    --  deal; the tile then transforms into a regular, berry-less bush
-    --  berries replenish 1% hunger
-    self:modifyHunger(-1)
+    --  using a berry bush means picking the berries from it; the collected
+    --  berries (or rather, berry) go(es) into the actor's inventory
+    self:addItemToInventory(Item.new(ItemData["berry"]))
 
     if self.isPlayer then
-      self.gameInstance:announce("You eat the berries.")
+      self.gameInstance:announce("You gather some berries.", curses.green)
     end
 
     --  de-berry the bush
@@ -307,6 +338,109 @@ function Actor:useTerrain()
     --  don't count this as an action
     return false
   end
+end
+
+--  Actor:addItemToInventory - adds a specific item into the actor's inventory
+--  item: the item to be added
+function Actor:addItemToInventory(item)
+  table.insert(self.inventory, item)
+end
+
+--  Actor:pickUp - picks up an item from the floor (if any); returns true if
+--  the action has been successfully completed, and false otherwise
+function Actor:pickUp()
+  --  retrieve the item from the floor
+  local i = self.gameInstance:itemAt(self.x, self.y)
+
+  --  there's nothing to pick up
+  if not i then
+    --  warn the user that this is the case
+    if self.isPlayer then
+      self.gameInstance:announce("There's nothing to pick up.")
+    end
+
+    --  no action has been taken
+    return false
+  end
+
+  --  add it into the actor's inventory
+  self:addItemToInventory(i)
+
+  --  remove it from the game's list
+  self.gameInstance:removeItem(i)
+
+  --  the actor has successfully picked up the item
+  if self.isPlayer then
+    self.gameInstance:announce("You pick up the " .. i.name)
+  end
+
+  return true
+end
+
+--  Actor:applyItem - applies an item onto the actor; returns true if an
+--  action has been successfully taken, and false otherwise
+function Actor:applyItem(item)
+  if item.name == "Berry" then
+    --  berries decrease the actor's hunger level
+    self:modifyHunger(-1)
+    if self.isPlayer then
+      self.gameInstance:announce("Yummy.", curses.green)
+    end
+
+    return true
+  end
+
+  --  nothing has been done
+  if self.isPlayer then
+    self.gameInstance:announce("I don't know if that's possible.")
+  end
+
+  return false
+end
+
+--  Actor:showInventory - shows what the actor is currently carrying
+--  answer - if true, then the user may specify an item, after which it is
+--  returned (for use in compound actions)
+function Actor:showInventory(answer)
+  curses.clear()
+
+  if #self.inventory == 0 then
+    curses.attr(curses.white)
+    curses.write(2, 1, "Your inventory is empty.")
+
+    if answer then
+      return nil
+    end
+  end
+
+  curses.attr(curses.white)
+  curses.write(2, 0, "Inventory: " .. #self.inventory .. " items.")
+
+  for i = 1, #(self.inventory) do
+    local it = self.inventory[i]
+    
+    curses.attr(curses.white)
+    curses.write(2, i, string.char(96+i) .. ") " .. it.name)
+  end
+
+  if answer then
+    local k = curses.getch()
+    local id = 0
+
+    if string.len(k) == 1 then
+      --  single keystroke - interpret as item index
+      id = string.byte(k, 1) - 96
+    end
+
+    if id > 0 and id <= #self.inventory then
+      curses.clear()
+      return self.inventory[id]
+    end
+  else
+    curses.getch()
+  end
+
+  return nil
 end
 
 return Actor

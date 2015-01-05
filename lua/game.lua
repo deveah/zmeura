@@ -204,6 +204,22 @@ function Game:removeMap(map)
   table.remove(self.mapList, index)
 end
 
+--  Game:itemAt - returns the item at a specified position, or nil, if none
+--  can be found
+--  x, y: coordinates of the point to search
+--  map:  map on which the item should be
+function Game:itemAt(x, y, map)
+  for i = 1, #(self.itemList) do
+    local it = self.itemlist[i]
+    if it.map == map and it.x == x and it.y == y then
+      return it
+    end
+  end
+
+  --  nothing has been found, so return nil
+  return nil
+end
+
 --  Game:drawMainScreen - draws the main screen - map display, message bars,
 --  player data etc.
 function Game:drawMainScreen()
