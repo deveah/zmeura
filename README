@@ -7,6 +7,8 @@
     (http://github.com/deveah/mazga) minimal roguelike framework.
 
     Right now you can wander around a small-ish map and destroy trees.
+    And eat berries gathered from berry bushes, and drink water from puddles.
+    It's already that much fun.
 
     List of done things
     --
@@ -18,6 +20,8 @@
     5.  Hunger (basic, non-lethal)
     6.  Destructible terrain
     7.  Weather (basic, rain or sunny)
+    8.  Items
+    9.  Inventory
 
     List of things to do
     --
@@ -25,8 +29,8 @@
     0.  A purpose to all of this
     1.  Other actors (both peaceful and less peaceful)
     2.  Death
-    3.  Items
-    4.  Inventory
+    3.  Stacking inventory items
+    4.  Dropping items from the inventory
 
     How to compile
     --
