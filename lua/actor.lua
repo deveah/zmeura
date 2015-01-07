@@ -346,6 +346,20 @@ function Actor:addItemToInventory(item)
   table.insert(self.inventory, item)
 end
 
+--  Actor:removeFromInventory - removes a specific item from an actor's
+--  inventory; other items are slided back towards the beginning
+--  item: the item to be removed
+function Actor:removeItemFromInventory(item)
+  local index = 0
+  for i = 1, #(self.inventory) do
+    if self.inventory[i] == item then
+      index = i
+    end
+  end
+
+  table.remove(self.inventory, i)
+end
+
 --  Actor:pickUp - picks up an item from the floor (if any); returns true if
 --  the action has been successfully completed, and false otherwise
 function Actor:pickUp()
@@ -385,6 +399,12 @@ function Actor:applyItem(item)
     self:modifyHunger(-1)
     if self.isPlayer then
       self.gameInstance:announce("Yummy.", curses.green)
+    end
+
+    --  be sure to deplete the item after use
+    item.quantity = item.quantity - 1
+    if item.quantity == 0 then
+      self:removeItemFromInventory(item)
     end
 
     return true

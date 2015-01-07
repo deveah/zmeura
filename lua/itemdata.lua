@@ -6,7 +6,8 @@ return {
   ["berry"] = {
     name = "Berry",
     face = "%",
-    color = curses.magenta
+    color = curses.magenta,
+    quantity = 1
   }
 }
 
